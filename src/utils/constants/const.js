@@ -1,4 +1,4 @@
-export const DOG = require("../../../assets/images/vecteezy_cartoon-funny-dog-standing-isolated-on-white-background_.jpg");
+export const DOG = require("../../../assets/images/vecteezy_cartoon-funny-little-dog-playing-ball_.jpg");
 export const DOG_SOUND = require("../../../assets/sounds/animalSounds/mixkit-dog-barking-twice-1.wav");
 export const CAT = require("../../../assets/images/vecteezy_little-cute-cat-in-cartoon-style_8137317.jpg");
 export const CAT_SOUND = require("../../../assets/sounds/animalSounds/mixkit-cartoon-kitty-begging-meow-92.wav");
@@ -15,4 +15,4 @@ export const PIG_SOUND = require("../../../assets/sounds/animalSounds/mixkit-big
 export const HORSE = require("../../../assets/images/vecteezy_cartoon-brown-horse-isolated-on-white-background_.jpg");
 export const HORSE_SOUND = require("../../../assets/sounds/animalSounds/mixkit-scared-horse-neighing-85.wav");
 export const LION = require("../../../assets/images/vecteezy_lion-with-white-background-the-best-cartoonist-lion-vector_9156093.jpg");
-export const LION_SOUND = require("../../../assets/sounds/animalSounds/mixkit-wild-lion-animal-roar-6.wav");
+export const LION_SOUND = require("../../../assets/sounds/animalSounds/mixkit-wild-lion-animal-roar-6.wav")

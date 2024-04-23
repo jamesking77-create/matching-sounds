@@ -35,8 +35,8 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   animalBox: {
-    width: 90,
-    height: 90,
+    width: 95,
+    height: 120,
     marginHorizontal: 10,
     backgroundColor: "white",
     justifyContent: "center",
@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
+    
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -57,6 +58,10 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "contain",
     borderRadius: 10,
+  },
+  animalName:{
+    fontWeight:'bold',
+    marginBottom:10
   },
   navContainer: {
     flexDirection: "row",

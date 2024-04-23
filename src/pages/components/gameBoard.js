@@ -124,15 +124,15 @@ const GamePage = () => {
 
   const loadAnimalPairs = () => {
     const pairs = [
-      { image: CAT, sound: CAT_SOUND },
-      { image: DOG, sound: DOG_SOUND },
-      { image: GOAT, sound: GOAT_SOUND },
-      { image: CHICKEN, sound: CHICKEN_SOUND },
-      { image: EAGLE, sound: EAGLE_SOUND },
-      { image: HORSE, sound: HORSE_SOUND },
-      { image: COW, sound: COW_SOUND },
-      { image: PIG, sound: PIG_SOUND },
-      { image: LION, sound: LION_SOUND },
+      { image: CAT, sound: CAT_SOUND, name: 'CAT' },
+      { image: DOG, sound: DOG_SOUND, name: 'DOG' },
+      { image: GOAT, sound: GOAT_SOUND, name: 'GOAT' },
+      { image: CHICKEN, sound: CHICKEN_SOUND, name: 'HEN' },
+      { image: EAGLE, sound: EAGLE_SOUND, name: 'EAGLE' },
+      { image: HORSE, sound: HORSE_SOUND, name: 'HORSE' },
+      { image: COW, sound: COW_SOUND, name: 'COW' },
+      { image: PIG, sound: PIG_SOUND, name: 'PIG' },
+      { image: LION, sound: LION_SOUND, name: 'LION' },
     ];
 
     const shuffledPairs = shuffleArray(pairs);
@@ -222,7 +222,9 @@ const GamePage = () => {
               onPress={() => handleAnimalBoxClick(index)}
             >
               <Image source={pair.image} style={styles.animalImage} />
+              <Text style={styles.animalName}>{pair.name}</Text>
             </TouchableOpacity>
+           
           ))}
         </View>
         <View style={styles.navContainer}>
