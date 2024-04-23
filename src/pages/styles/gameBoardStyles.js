@@ -1,32 +1,48 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   backgroundImage: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "center",
   },
-  contentContainer: {
-    marginTop: 180,
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
     alignItems: "center",
-    justifyContent: "center",
   },
-  logo: {
-    width: 200,
+  megaPhoneBox: {
+    width: 100,
     height: 100,
-    marginBottom: -30,
-  },
-  playButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    width: 200,
     justifyContent: "center",
-    marginTop: 100,
+    alignItems: "center",
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: "white",
+    borderRadius: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+  },
+  megaPhoneIcon: {
+    width: 60,
+    height: 60,
+    resizeMode: "contain",
+  },
+  animalBoxesContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 40,
+  },
+  animalBox: {
+    width: 90,
+    height: 90,
+    marginHorizontal: 10,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -36,15 +52,16 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  playButtonText: {
-    color: "#ffffff",
-    fontSize: 25,
-    fontWeight: "bold",
-    textAlign: "center",
+  animalImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
+    borderRadius: 10,
   },
   navContainer: {
     flexDirection: "row",
-    marginTop: 50,
+    marginBottom: 20,
+    marginTop: 100,
   },
   navIcon: {
     width: 50,
@@ -60,6 +77,25 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  scoreBox: {
+    backgroundColor: "#007bff",
+    paddingVertical: 20,
+    paddingHorizontal: 80,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  scoreText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -73,6 +109,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 10,
     alignItems: "center",
+    padding: 100,
   },
   modalTitle: {
     fontSize: 20,

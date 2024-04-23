@@ -1,17 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native';
-import { Audio } from 'expo-av';
-import { CAT, CAT_SOUND, CHICKEN, CHICKEN_SOUND, COW, COW_SOUND, DOG, DOG_SOUND, EAGLE, EAGLE_SOUND, GOAT, GOAT_SOUND, HORSE, HORSE_SOUND, LION, LION_SOUND, PIG, PIG_SOUND } from '../../utils/constants/const';
-
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+} from "react-native";
+import { Audio } from "expo-av";
+import {
+  CAT,
+  CAT_SOUND,
+  CHICKEN,
+  CHICKEN_SOUND,
+  COW,
+  COW_SOUND,
+  DOG,
+  DOG_SOUND,
+  EAGLE,
+  EAGLE_SOUND,
+  GOAT,
+  GOAT_SOUND,
+  HORSE,
+  HORSE_SOUND,
+  LION,
+  LION_SOUND,
+  PIG,
+  PIG_SOUND,
+} from "../../utils/constants/const";
+import { useNavigation } from "@react-navigation/native";
+import { CorrectAlert, WrongAlert } from "../../utils/reusable/alerts";
+import Slider from "@react-native-community/slider";
+import GameOverModal from "../../utils/reusable/gameOverModal";
+import playClickSound from "../../utils/reusable/playClickSound";
+import styles from "../styles/gameBoardStyles";
 const GamePage = () => {
+  const navigation = useNavigation();
   const [score, setScore] = useState(0);
   const [round, setRound] = useState(1);
   const [animalPairs, setAnimalPairs] = useState([]);
-  const [correctAnimalIndex, setCorrectAnimalIndex] = useState(-1);
+  const [correctAnimalIndex, setCorrectAnimalIndex] = useState(0);
   const [sound, setSound] = useState();
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [infoVisible, setInfoVisible] = useState(false);
+  const [correctAlertVisible, setCorrectAlertVisible] = useState(false);
+  const [wrongAlertVisible, setWrongAlertVisible] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [backgroundVolume, setBackgroundVolume] = useState(1);
+  const [backgroundSound, setBackgroundSound] = useState();
+  const [gameOver, setGameOver] = useState(false);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const playBackgroundSound = async () => {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require("../../../assets/sounds/soundtracks/mixkit-playful-10.mp3"),
+          { volume: backgroundVolume }
+        );
+        await sound.setIsLoopingAsync(true);
+        await sound.playAsync();
+        if (isMounted) {
+          setBackgroundSound(sound);
+        }
+      } catch (error) {
+        console.log("Error playing background sound:", error);
+      }
+    };
+
+    playBackgroundSound();
+
+    return () => {
+      isMounted = false;
+      if (backgroundSound) {
+        backgroundSound.unloadAsync();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+     
+      if (backgroundSound) {
+        backgroundSound.stopAsync();
+        backgroundSound.unloadAsync();
+      }
+    };
+  }, [backgroundSound]);
+
+  const setVolume = (value) => {
+    setBackgroundVolume(value);
+    if (backgroundSound) {
+      backgroundSound.setVolumeAsync(value);
+    }
+  };
+
+  const togglePause = () => {
+    setIsPaused(!isPaused);
+  };
 
   const toggleSettingsModal = () => {
     setSettingsVisible(!settingsVisible);
@@ -24,7 +113,6 @@ const GamePage = () => {
   useEffect(() => {
     loadAnimalPairs();
   }, []);
-
 
   const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -55,9 +143,18 @@ const GamePage = () => {
   };
 
   const startNewRound = () => {
-    loadAnimalPairs()
+    loadAnimalPairs();
     const randomIndex = Math.floor(Math.random() * animalPairs.length);
     setCorrectAnimalIndex(randomIndex);
+    setRound(round + 1);
+    if (round === 5) {
+      if (backgroundSound) {
+        backgroundSound.stopAsync();
+        backgroundSound.unloadAsync();
+      }
+      playClickSound(require('../../../assets/sounds/soundtracks/mixkit-game-experience-level-increased-2062.wav'))
+      setGameOver(true);
+    }
   };
 
   const handleMegaPhonePress = () => {
@@ -69,18 +166,15 @@ const GamePage = () => {
   };
 
   const handleAnimalBoxClick = (index) => {
+    playClickSound(require('../../../assets/sounds/soundtracks/mixkit-game-ball-tap-2073.wav'))
     if (index === correctAnimalIndex) {
       setScore(score + 5);
-      Alert.alert('Correct!', 'You matched the correct animal!', [
-        { text: 'OK', onPress: () => startNewRound() }
-      ]);
+      setCorrectAlertVisible(true);
     } else {
       if (score > 0) {
         setScore(score - 2);
       }
-      Alert.alert('Incorrect!', 'Sorry, that\'s not the correct animal.', [
-        { text: 'OK', onPress: () => startNewRound() }
-      ]);
+      setWrongAlertVisible(true);
     }
   };
 
@@ -90,29 +184,75 @@ const GamePage = () => {
       setSound(sound);
       await sound.playAsync();
     } catch (error) {
-      console.log('Error playing sound:', error);
+      console.log("Error playing sound:", error);
     }
   };
 
+  const handleReplay = () => {
+    setScore(0);
+    setRound(1);
+    loadAnimalPairs();
+    setGameOver(false);
+  };
+
+  const handleQuit = () => {
+    navigation.goBack();
+  };
+
   return (
-    <ImageBackground source={require('../../../assets/images/vecteezy_farm-scene-with-windmill-and-barn_6269239.jpg')} style={styles.backgroundImage}>
+    <ImageBackground
+      source={require("../../../assets/images/vecteezy_farm-scene-with-windmill-and-barn_6269239.jpg")}
+      style={styles.backgroundImage}
+    >
       <View style={styles.overlay}>
-        <TouchableOpacity style={styles.megaPhoneBox} onPress={handleMegaPhonePress}>
-          <Image source={require('../../../assets/images/vecteezy_3d-isolated-electronic-and-gadget_11222261.png')} style={styles.megaPhoneIcon} />
+        <TouchableOpacity
+          style={styles.megaPhoneBox}
+          onPress={handleMegaPhonePress}
+        >
+          <Image
+            source={require("../../../assets/images/vecteezy_3d-isolated-electronic-and-gadget_11222261.png")}
+            style={styles.megaPhoneIcon}
+          />
         </TouchableOpacity>
         <View style={styles.animalBoxesContainer}>
           {animalPairs.map((pair, index) => (
-            <TouchableOpacity key={index} style={styles.animalBox} onPress={() => handleAnimalBoxClick(index)}>
+            <TouchableOpacity
+              key={index}
+              style={styles.animalBox}
+              onPress={() => handleAnimalBoxClick(index)}
+            >
               <Image source={pair.image} style={styles.animalImage} />
             </TouchableOpacity>
           ))}
         </View>
         <View style={styles.navContainer}>
-          <TouchableOpacity style={styles.navIcon} onPress={toggleSettingsModal}>
-            <Image source={require('../../../assets/images/settings.png')} style={styles.navImage} />
+          <TouchableOpacity
+            style={styles.navIcon}
+            onPress={toggleSettingsModal}
+          >
+            <Image
+              source={require("../../../assets/images/settings.png")}
+              style={styles.navImage}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navIcon} onPress={togglePause}>
+            {isPaused ? (
+              <Image
+                source={require("../../../assets/images/pause_5251071.png")}
+                style={styles.navImage}
+              />
+            ) : (
+              <Image
+                source={require("../../../assets/images/pause_5251071.png")}
+                style={styles.navImage}
+              />
+            )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.navIcon} onPress={toggleInfoModal}>
-            <Image source={require('../../../assets/images/information.png')} style={styles.navImage} />
+            <Image
+              source={require("../../../assets/images/information.png")}
+              style={styles.navImage}
+            />
           </TouchableOpacity>
         </View>
         <View style={styles.scoreBox}>
@@ -120,12 +260,41 @@ const GamePage = () => {
         </View>
       </View>
 
+      <View>
+        <CorrectAlert
+          visible={correctAlertVisible}
+          onDismiss={() => {
+            setCorrectAlertVisible(false);
+            startNewRound();
+          }}
+        />
+        <WrongAlert
+          visible={wrongAlertVisible}
+          onDismiss={() => {
+            setWrongAlertVisible(false);
+            startNewRound();
+          }}
+        />
+      </View>
+
       <Modal visible={settingsVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Settings</Text>
-            {/* Add settings options here */}
-            <TouchableOpacity style={styles.closeButton} onPress={toggleSettingsModal}>
+            <Text style={styles.modalText}>Music Volume:</Text>
+            <Slider
+              style={styles.slider}
+              minimumValue={0.0}
+              maximumValue={1.0}
+              value={backgroundVolume}
+              onValueChange={setVolume}
+              minimumTrackTintColor="#007bff"
+              maximumTrackTintColor="#000000"
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={toggleSettingsModal}
+            >
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -136,125 +305,44 @@ const GamePage = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <ScrollView>
-              <Text style={styles.modalTitle}>Info</Text>
-              {/* Add game instructions here */}
+              <Text style={styles.modalTitle}>Instructions</Text>
+              <Text style={styles.modalText}>
+                To play the game, simply click on the megaphone icon on every
+                round to match the correct animal card to gain points.
+              </Text>
             </ScrollView>
-            <TouchableOpacity style={styles.closeButton} onPress={toggleInfoModal}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={toggleInfoModal}
+            >
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
+
+      <Modal visible={isPaused} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Game Paused</Text>
+            <Text style={styles.modalTitle}>Current Score: {score}</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={togglePause}>
+              <Text style={styles.closeButtonText}>Resume</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <GameOverModal
+        visible={gameOver} 
+        score={score} 
+        handleReplay={handleReplay} 
+        handleQuit={handleQuit} 
+      />
     </ImageBackground>
   );
 };
 
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  megaPhoneBox: {
-    width: 100,
-    height: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 2,
-    borderColor: 'white',
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-  },
-  megaPhoneIcon: {
-    width: 60,
-    height: 60,
-    resizeMode: 'contain',
-  },
-  animalBoxesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  animalBox: {
-    width: 80,
-    height: 80,
-    marginHorizontal: 10,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: 10,
-  },
-  animalImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
-    borderRadius: 10,
-  },
-  navContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-  navIcon: {
-    width: 50,
-    height: 50,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 10,
-    padding: 10,
-    borderRadius: 10,
-  },
-  navImage: {
-    width: '100%',
-    height: '100%',
-  },
-  scoreBox: {
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 10,
-  },
-  scoreText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    padding: 100
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  closeButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-});
+
 
 export default GamePage;
