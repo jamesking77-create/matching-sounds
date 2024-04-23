@@ -48,7 +48,7 @@ const GamePage = () => {
   const [correctAlertVisible, setCorrectAlertVisible] = useState(false);
   const [wrongAlertVisible, setWrongAlertVisible] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [backgroundVolume, setBackgroundVolume] = useState(1);
+  const [backgroundVolume, setBackgroundVolume] = useState(0.3);
   const [backgroundSound, setBackgroundSound] = useState();
   const [gameOver, setGameOver] = useState(false);
 
@@ -169,11 +169,13 @@ const GamePage = () => {
     playClickSound(require('../../../assets/sounds/soundtracks/mixkit-game-ball-tap-2073.wav'))
     if (index === correctAnimalIndex) {
       setScore(score + 5);
+      playClickSound(require('../../../assets/sounds/soundtracks/mixkit-girls-audience-applause-510-[AudioTrimmer.com].wav'))
       setCorrectAlertVisible(true);
     } else {
       if (score > 0) {
         setScore(score - 2);
       }
+      playClickSound(require('../../../assets/sounds/soundtracks/mixkit-wrong-answer-fail-notification-946.wav'))
       setWrongAlertVisible(true);
     }
   };
@@ -292,6 +294,7 @@ const GamePage = () => {
               onValueChange={setVolume}
               minimumTrackTintColor="#007bff"
               maximumTrackTintColor="#000000"
+              step={0.03}
             />
             <TouchableOpacity
               style={styles.closeButton}

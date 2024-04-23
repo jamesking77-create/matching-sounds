@@ -145,6 +145,7 @@ const LandingPage = () => {
               onValueChange={setVolume}
               minimumTrackTintColor="#007bff"
               maximumTrackTintColor="#000000"
+              step={0.03}
             />
             <TouchableOpacity
               style={styles.closeButton}
